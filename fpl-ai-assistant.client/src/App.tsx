@@ -1,6 +1,4 @@
 import { useState } from "react";
-import "./App.css";
-
 import { Player } from "./types/Player";
 import { Chip } from "./types/Chip";
 import { Advice } from "./types/Advice";
@@ -81,7 +79,7 @@ function App() {
 
   return (
     <div className="App">
-      <h1>FPL AI-assistant</h1>
+      <h1 className="text-3xl font-bold text-green-500">FPL AI-assistant</h1>
       <form onSubmit={handleFetch}>
         <input
           type="text"
