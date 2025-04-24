@@ -1,16 +1,27 @@
-# Node (frontend)
+# Node & Python dependencies
 node_modules/
-dist/
-
-# Python (backend)
 venv/
 __pycache__/
 *.pyc
 *.pyo
 
-# VSCode / OS
-.vscode/
-.DS_Store
-
-# Env
+# Logs & Environment
+*.log
 .env
+.env.*
+*.local
+
+# Build & coverage
+dist/
+build/
+coverage/
+
+# OS-specific and editor files
+.DS_Store
+.vscode/
+.idea/
+*.sw?
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
