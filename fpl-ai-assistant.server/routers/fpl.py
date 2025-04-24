@@ -46,12 +46,23 @@ def get_latest_played_gameweek():
     current_event = max(finished_events, key=lambda e: e['id'])
     return current_event['id']
 
-def get_player_name_map():
+def get_player_info_map():
     res = requests.get("https://fantasy.premierleague.com/api/bootstrap-static/")
     if not res.ok:
         raise HTTPException(status_code=500, detail="Could not fetch player data.")
-    elements = res.json()['elements']
-    return {player['id']: f"{player['first_name']} {player['second_name']}" for player in elements}
+    data = res.json()
+    elements = data['elements']
+    teams = {team['id']: team['name'] for team in data['teams']}
+
+    return {
+        player['id']: {
+            "name": f"{player['first_name']} {player['second_name']}",
+            "team": teams.get(player['team'], "Unknown Team"),
+            "web_name": player['web_name'],
+            "photo": player['photo'],
+        }
+        for player in elements
+    }
 
 @router.get("/{team_id}")
 def get_team(team_id: int):
@@ -61,9 +72,13 @@ def get_team(team_id: int):
     if not response.ok:
         raise HTTPException(status_code=500, detail="Could not fetch team data.")
     picks = response.json()
-    name_map = get_player_name_map()
+    player_map = get_player_info_map()
     for pick in picks.get("picks", []):
-        pick["name"] = name_map.get(pick["element"], f"ID {pick['element']}")
+        info = player_map.get(pick["element"])
+        pick["name"] = info["name"]
+        pick["team"] = info["team"]
+        pick["web_name"] = info["web_name"]
+        pick["photo"] = info["photo"]
     return picks
 
 @router.post("/analyze")
