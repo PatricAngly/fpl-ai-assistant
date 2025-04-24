@@ -3,6 +3,7 @@ import { Player } from "./types/Player";
 import { Chip } from "./types/Chip";
 import { Advice } from "./types/Advice";
 import { parseAdvice } from "./utils/parseAdvice";
+import Pitch from "./components/Pitch";
 
 function App() {
   const [teamId, setTeamId] = useState("");
@@ -28,7 +29,6 @@ function App() {
       const data = await res.json();
       setPlayers(data.picks);
       setGameweek(data.entry_history.event);
-      console.log("Fetched data:", data); // Logga den hämtade datan
     } catch (err) {
       setError("Could not fetch data.");
     } finally {
@@ -62,9 +62,8 @@ function App() {
       if (data.advice) {
         if (parsed) {
           setAdvice(parsed);
-          console.log("Parsed advice:", parsed); // Logga den parserade advicen
         } else {
-          setAdvice({ notes: data.advice }); // fallback
+          setAdvice({ notes: data.advice });
         }
       } else {
         setError("No analysis data received.");
@@ -96,14 +95,7 @@ function App() {
       {players.length > 0 && (
         <>
           <h2>Your team GW:{gameweek}</h2>
-          <ul>
-            {players.map((p) => (
-              <li key={p.element}>
-                {p.name || `ID: ${p.element}`} | Position: {p.position}{" "}
-                {p.is_captain && "🧢"}
-              </li>
-            ))}
-          </ul>
+          <Pitch players={players} />
           <h3>Available chips:</h3>
           <div className="chip-options">
             {Object.keys(chips).map((key) => (

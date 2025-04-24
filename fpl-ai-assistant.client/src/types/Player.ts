@@ -5,4 +5,5 @@ export interface Player {
   is_vice_captain: boolean;
   element_type: number;
   name?: string;
+  multiplier: number;
 }
