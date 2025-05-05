@@ -59,7 +59,8 @@ def get_player_info_map():
             "name": f"{player['first_name']} {player['second_name']}",
             "team": teams.get(player['team'], "Unknown Team"),
             "web_name": player['web_name'],
-            "photo": player['photo'],
+            "team_id": player["team"],
+            "team_code": player["team_code"],
         }
         for player in elements
     }
@@ -78,7 +79,8 @@ def get_team(team_id: int):
         pick["name"] = info["name"]
         pick["team"] = info["team"]
         pick["web_name"] = info["web_name"]
-        pick["photo"] = info["photo"]
+        pick["team_id"] = info["team_id"]
+        pick["team_code"] = info["team_code"]
     return picks
 
 @router.post("/analyze")

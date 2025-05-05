@@ -6,4 +6,8 @@ export interface Player {
   element_type: number;
   name?: string;
   multiplier: number;
+  team: string;
+  web_name: string;
+  photo: string;
+  team_code: number;
 }

@@ -27,6 +27,7 @@ function App() {
     try {
       const res = await fetch(`http://localhost:8000/api/fpl/${teamId}`);
       const data = await res.json();
+      console.log("Fetched data:", data);
       setPlayers(data.picks);
       setGameweek(data.entry_history.event);
     } catch (err) {
@@ -96,25 +97,27 @@ function App() {
         <>
           <h2>Your team GW:{gameweek}</h2>
           <Pitch players={players} />
-          <h3>Available chips:</h3>
-          <div className="chip-options">
-            {Object.keys(chips).map((key) => (
-              <label key={key} style={{ marginRight: "1rem" }}>
-                <input
-                  type="checkbox"
-                  checked={chips[key as keyof Chip]}
-                  onChange={() =>
-                    setChips((prev) => ({
-                      ...prev,
-                      [key]: !prev[key as keyof Chip],
-                    }))
-                  }
-                />
-                {key}
-              </label>
-            ))}
+          <div className="flex flex-col items-center mt-10">
+            <h3>Available chips:</h3>
+            <div className="flex flex-row gap-2 mb-4 flex-wrap justify-center">
+              {Object.keys(chips).map((key) => (
+                <label key={key} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={chips[key as keyof Chip]}
+                    onChange={() =>
+                      setChips((prev) => ({
+                        ...prev,
+                        [key]: !prev[key as keyof Chip],
+                      }))
+                    }
+                  />
+                  {key}
+                </label>
+              ))}
+            </div>
+            <button onClick={handleAnalyze}>Analyze with AI</button>
           </div>
-          <button onClick={handleAnalyze}>Analyze with AI</button>
         </>
       )}
 
