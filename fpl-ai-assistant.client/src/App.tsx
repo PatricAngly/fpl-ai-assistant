@@ -83,51 +83,65 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <h1 className="text-3xl font-bold text-green-500">FPL AI-assistant</h1>
-      <form onSubmit={handleFetch}>
-        <input
-          type="text"
-          placeholder="FPL Team ID"
-          value={teamId}
-          onChange={(e) => setTeamId(e.target.value)}
-        />
-        <button type="submit">Get team</button>
-      </form>
+    <div className="lg:flex lg:flex-row lg:items-center min-h-screen bg-gradient-to-b text-[#37003c] p-4">
+      <div className="lg:flex-auto text-center">
+        <h1 className="text-3xl font-bold text-green-500">FPL AI-assistant</h1>
+        <form onSubmit={handleFetch}>
+          <input
+            className="border border-gray-300 rounded p-2 mt-4 mb-2"
+            type="text"
+            placeholder="FPL Team ID"
+            value={teamId}
+            onChange={(e) => setTeamId(e.target.value)}
+          />
+          <button
+            className="p-2 rounded-sm bg-[#37003c] ml-6 text-white"
+            type="submit"
+          >
+            Get team
+          </button>
+        </form>
 
-      {loading && <p>Loading...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+        {loading && <p>Loading...</p>}
+        {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {players.length > 0 && (
-        <>
-          <h2>Your team GW:{gameweek}</h2>
-          <Pitch players={players} />
-          <div className="flex flex-col items-center mt-10">
-            <h3>Available chips:</h3>
-            <div className="flex flex-row gap-2 mb-4 flex-wrap justify-center">
-              <ul className="flex gap-2 flex-wrap">
-                {availableChips.map((chip, i) => (
-                  <li key={i}>
-                    <span className="bg-white text-black text-xs font-semibold px-2 py-1 rounded shadow">
-                      {formatChipName[chip] ?? chip}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+        {players.length > 0 && (
+          <>
+            <h2 className="text-[#37003c] font-bold ">
+              Your team GW:{gameweek}
+            </h2>
+            <Pitch players={players} />
+            <div className="flex flex-col items-center mt-10">
+              <h3>Available chips:</h3>
+              <div className="flex flex-row gap-2 mt-2 flex-wrap justify-center">
+                <ul className="flex gap-2 flex-wrap ">
+                  {availableChips.map((chip, i) => (
+                    <li key={i}>
+                      <span className="bg-[#37003c] text-white text-xs font-semibold px-2 py-1 rounded shadow">
+                        {formatChipName[chip] ?? chip}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <button
+                className="p-2 rounded-sm bg-[linear-gradient(to_right,rgb(0,255,135),rgb(2,239,255))] mt-6"
+                onClick={handleAnalyze}
+              >
+                Analyze with AI
+              </button>
             </div>
-            <button onClick={handleAnalyze}>Analyze with AI</button>
-          </div>
-        </>
-      )}
-
+          </>
+        )}
+      </div>
       {advice && (
-        <div>
+        <div className="bg-white p-4 rounded shadow lg::mt-10 max-w-3xl mx-auto lg:flex-auto">
           {advice.transfers && (
             <>
-              <h3>Transfers</h3>
+              <h3 className="text-[#37003c] mt-2 font-bold">Transfers</h3>
               <ul>
                 {advice.transfers.map((t, i) => (
-                  <li key={i}>
+                  <li key={i} className="text-[#37003c] ">
                     Out: {t.out} ➝ In: {t.in}
                   </li>
                 ))}
@@ -135,12 +149,12 @@ function App() {
             </>
           )}
           {advice.captain && (
-            <p>
+            <p className="text-[#37003c] mt-2">
               <strong>Captain:</strong> {advice.captain}
             </p>
           )}
           {advice.chips && (
-            <p>
+            <p className="text-[#37003c] mt-2">
               <strong>Chips:</strong>{" "}
               {Array.isArray(advice.chips)
                 ? advice.chips.join(", ")
@@ -148,7 +162,7 @@ function App() {
             </p>
           )}
           {advice.notes && (
-            <p>
+            <p className="text-[#37003c] mt-2">
               <strong>Notes:</strong> {advice.notes}
             </p>
           )}

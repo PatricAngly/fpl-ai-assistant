@@ -10,4 +10,5 @@ export interface Player {
   web_name: string;
   photo: string;
   team_code: number;
+  points: number;
 }

@@ -24,8 +24,8 @@ const Pitch = ({ players }: Props) => {
       {line.map((p) => (
         <PlayerCard
           key={p.element}
-          web_name={p.name?.split(" ").slice(-1).join(" ") ?? `ID ${p.element}`}
-          team={p.team ?? ""}
+          web_name={p.web_name}
+          points={p.points * p.multiplier}
           is_captain={p.is_captain}
           is_vice_captain={p.is_vice_captain}
           team_code={
@@ -51,10 +51,8 @@ const Pitch = ({ players }: Props) => {
           {bench.map((p) => (
             <PlayerCard
               key={p.element}
-              web_name={
-                p.name?.split(" ").slice(-1).join(" ") ?? `ID ${p.element}`
-              }
-              team={p.team ?? ""}
+              web_name={p.web_name}
+              points={p.points}
               is_captain={p.is_captain}
               is_vice_captain={p.is_vice_captain}
               team_code={

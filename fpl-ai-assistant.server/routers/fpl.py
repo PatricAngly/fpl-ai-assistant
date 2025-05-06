@@ -57,6 +57,15 @@ def get_player_info_map():
         }
         for player in elements
     }
+
+def get_player_points_map(gw: int) -> dict[int, int]:
+    url = f"https://fantasy.premierleague.com/api/event/{gw}/live/"
+    res = requests.get(url)
+    if not res.ok:
+        raise HTTPException(status_code=500, detail="Could not fetch live points.")
+    data = res.json()["elements"]
+    return {player["id"]: player["stats"]["total_points"] for player in data}
+
 @router.get(
     "/{team_id}/available-chips",
     response_model=list[str],
@@ -76,18 +85,24 @@ def get_available_chips(team_id: int) -> list[str]:
 @router.get("/{team_id}")
 def get_team(team_id: int):
     gw = get_latest_played_gameweek()
+
     res = requests.get(f"https://fantasy.premierleague.com/api/entry/{team_id}/event/{gw}/picks/")
     if not res.ok:
         raise HTTPException(status_code=500, detail="Could not fetch team data.")
     picks = res.json()
+
     player_map = get_player_info_map()
+    points_map = get_player_points_map(gw)
+
     for pick in picks.get("picks", []):
-        info = player_map.get(pick["element"])
+        element_id = pick["element"]
+        info = player_map.get(element_id)
         pick["name"] = info["name"]
         pick["team"] = info["team"]
         pick["web_name"] = info["web_name"]
         pick["team_id"] = info["team_id"]
         pick["team_code"] = info["team_code"]
+        pick["points"] = points_map.get(element_id, 0)
     return picks
 
 @router.post("/analyze")
@@ -112,7 +127,7 @@ def analyze_team(request: AnalyzeRequest):
             "Give improvement suggestions for the next gameweek. Format your response with the following keys as raw JSON, do not use Markdown or backticks. \n"
             "- 'transfers': List of suggested player transfers, { out: string; in: string }[];\n"
             "- 'captain': Suggested captain\n"
-            "- 'chips': Suggested chip usage (if suggested, give short explanation or show chips left)\n"
+            "- 'chips': Suggested chip usage (if suggested, give short explanation) e.g. [""]\n"
             "- 'notes': Additional tips or insights."
         )
         
