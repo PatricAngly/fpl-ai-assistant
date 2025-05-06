@@ -1,7 +1,7 @@
-export interface Chip {
-  wildcard: boolean;
-  freehit: boolean;
-  benchBoost: boolean;
-  tripleCaptain: boolean;
-  assistantManager: boolean;
-}
+export type Chip =
+  | "wildcard"
+  | "freehit"
+  | "bboost"
+  | "3xc"
+  | "wildcard"
+  | "manager";

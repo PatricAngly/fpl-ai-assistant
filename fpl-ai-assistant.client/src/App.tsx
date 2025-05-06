@@ -3,6 +3,7 @@ import { Player } from "./types/Player";
 import { Chip } from "./types/Chip";
 import { Advice } from "./types/Advice";
 import { parseAdvice } from "./utils/parseAdvice";
+import { formatChipName } from "./utils/formatChipName";
 import Pitch from "./components/Pitch";
 
 function App() {
@@ -12,26 +13,30 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [advice, setAdvice] = useState<Advice | null>(null);
-  const [chips, setChips] = useState<Chip>({
-    wildcard: false,
-    freehit: false,
-    benchBoost: false,
-    tripleCaptain: false,
-    assistantManager: false,
-  });
+  const [availableChips, setAvailableChips] = useState<Chip[]>([]);
 
   const handleFetch = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`http://localhost:8000/api/fpl/${teamId}`);
-      const data = await res.json();
-      console.log("Fetched data:", data);
-      setPlayers(data.picks);
-      setGameweek(data.entry_history.event);
+      const [teamRes, chipsRes] = await Promise.all([
+        fetch(`http://localhost:8000/api/fpl/${teamId}`),
+        fetch(`http://localhost:8000/api/fpl/${teamId}/available-chips`),
+      ]);
+
+      if (!teamRes.ok || !chipsRes.ok) {
+        throw new Error("Något gick fel vid hämtning");
+      }
+
+      const teamData = await teamRes.json();
+      const chips = await chipsRes.json();
+
+      setPlayers(teamData.picks);
+      setGameweek(teamData.entry_history.event);
+      setAvailableChips(chips);
     } catch (err) {
-      setError("Could not fetch data.");
+      setError("Kunde inte hämta lag och chips.");
     } finally {
       setLoading(false);
     }
@@ -54,7 +59,7 @@ function App() {
         body: JSON.stringify({
           players,
           gw: gameweek,
-          chips,
+          chips: availableChips,
         }),
       });
 
@@ -100,21 +105,15 @@ function App() {
           <div className="flex flex-col items-center mt-10">
             <h3>Available chips:</h3>
             <div className="flex flex-row gap-2 mb-4 flex-wrap justify-center">
-              {Object.keys(chips).map((key) => (
-                <label key={key} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={chips[key as keyof Chip]}
-                    onChange={() =>
-                      setChips((prev) => ({
-                        ...prev,
-                        [key]: !prev[key as keyof Chip],
-                      }))
-                    }
-                  />
-                  {key}
-                </label>
-              ))}
+              <ul className="flex gap-2 flex-wrap">
+                {availableChips.map((chip, i) => (
+                  <li key={i}>
+                    <span className="bg-white text-black text-xs font-semibold px-2 py-1 rounded shadow">
+                      {formatChipName[chip] ?? chip}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             </div>
             <button onClick={handleAnalyze}>Analyze with AI</button>
           </div>

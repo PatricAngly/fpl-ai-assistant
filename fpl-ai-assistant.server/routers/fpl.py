@@ -23,17 +23,10 @@ class Player(BaseModel):
     element_type: int
     name: str | None = None
 
-class Chips(BaseModel):
-    wildcard: bool = False
-    freehit: bool = False
-    benchBoost: bool = False
-    tripleCaptain: bool = False
-    assistantManager: bool = False
-
 class AnalyzeRequest(BaseModel):
     players: list[Player]
     gw: int | None = None  
-    chips: Chips | None = None
+    chips: list[str] | None = None
 
 def get_latest_played_gameweek():
     res = requests.get("https://fantasy.premierleague.com/api/bootstrap-static/")
@@ -64,15 +57,29 @@ def get_player_info_map():
         }
         for player in elements
     }
+@router.get(
+    "/{team_id}/available-chips",
+    response_model=list[str],
+    summary="Get available chips",
+    description="Returns a list of chips the user has not yet used."
+)
+def get_available_chips(team_id: int) -> list[str]:
+    res = requests.get(f"https://fantasy.premierleague.com/api/entry/{team_id}/history/")
+    if not res.ok:
+        raise HTTPException(status_code=500, detail="Could not fetch chip data.")
+    data = res.json()
+    used = {chip["name"] for chip in data.get("chips", [])}
+    all_chips = {"wildcard", "freehit", "bboost", "3xc", "manager"}
+    return list(all_chips - used)
+
 
 @router.get("/{team_id}")
 def get_team(team_id: int):
     gw = get_latest_played_gameweek()
-    url = f"https://fantasy.premierleague.com/api/entry/{team_id}/event/{gw}/picks/"
-    response = requests.get(url)
-    if not response.ok:
+    res = requests.get(f"https://fantasy.premierleague.com/api/entry/{team_id}/event/{gw}/picks/")
+    if not res.ok:
         raise HTTPException(status_code=500, detail="Could not fetch team data.")
-    picks = response.json()
+    picks = res.json()
     player_map = get_player_info_map()
     for pick in picks.get("picks", []):
         info = player_map.get(pick["element"])
@@ -85,6 +92,7 @@ def get_team(team_id: int):
 
 @router.post("/analyze")
 def analyze_team(request: AnalyzeRequest):
+    print("✅ Available chips received:", request.chips) 
     try:
         gw = request.gw or get_latest_played_gameweek()
 
@@ -93,12 +101,10 @@ def analyze_team(request: AnalyzeRequest):
         for p in request.players
         ])
         
-
         chip_info = ""
         if request.chips:
-            used_chips = [name for name, used in request.chips.model_dump().items() if used]
-            if used_chips:
-                chip_info = f"\nAvailable chips: {', '.join(used_chips)}"
+            chip_info = f"\nAvailable chips: {', '.join(request.chips)}"
+            
 
         prompt = (
             f"Here is my FPL team gameweek {gw}:\n"
@@ -106,7 +112,7 @@ def analyze_team(request: AnalyzeRequest):
             "Give improvement suggestions for the next gameweek. Format your response with the following keys as raw JSON, do not use Markdown or backticks. \n"
             "- 'transfers': List of suggested player transfers, { out: string; in: string }[];\n"
             "- 'captain': Suggested captain\n"
-            "- 'chips': Suggested chip usage (if suggested, give short explanation)\n"
+            "- 'chips': Suggested chip usage (if suggested, give short explanation or show chips left)\n"
             "- 'notes': Additional tips or insights."
         )
         
