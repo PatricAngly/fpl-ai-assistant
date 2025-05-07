@@ -4,18 +4,22 @@ import { Chip } from "./types/Chip";
 import { Advice } from "./types/Advice";
 import { parseAdvice } from "./utils/parseAdvice";
 import { formatChipName } from "./utils/formatChipName";
+import { TeamScore } from "./types/TeamScore";
 import Pitch from "./components/Pitch";
+import TeamScoreCard from "./components/TeamScoreCard";
 
 function App() {
   const [teamId, setTeamId] = useState("");
   const [players, setPlayers] = useState<Player[]>([]);
-  const [gameweek, setGameweek] = useState<number | null>(null);
+  const [gameweek, setGameweek] = useState<TeamScore | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [advice, setAdvice] = useState<Advice | null>(null);
   const [availableChips, setAvailableChips] = useState<Chip[]>([]);
 
   const handleFetch = async (e: React.FormEvent) => {
+    setAdvice(null);
+    setAvailableChips([]);
     e.preventDefault();
     setLoading(true);
     setError("");
@@ -33,8 +37,9 @@ function App() {
       const chips = await chipsRes.json();
 
       setPlayers(teamData.picks);
-      setGameweek(teamData.entry_history.event);
+      setGameweek(teamData.entry_history);
       setAvailableChips(chips);
+      setTeamId("");
     } catch (err) {
       setError("Kunde inte hämta lag och chips.");
     } finally {
@@ -58,7 +63,7 @@ function App() {
         },
         body: JSON.stringify({
           players,
-          gw: gameweek,
+          gw: gameweek.event,
           chips: availableChips,
         }),
       });
@@ -81,6 +86,7 @@ function App() {
       setLoading(false);
     }
   };
+  console.log(gameweek);
 
   return (
     <div className="lg:flex lg:flex-row lg:items-center min-h-screen bg-gradient-to-b text-[#37003c] p-4">
@@ -108,7 +114,13 @@ function App() {
         {players.length > 0 && (
           <>
             <h2 className="text-[#37003c] font-bold ">
-              Your team GW:{gameweek}
+              {gameweek && (
+                <TeamScoreCard
+                  event={gameweek.event}
+                  points={gameweek.points}
+                  bank={gameweek.bank}
+                />
+              )}
             </h2>
             <Pitch players={players} />
             <div className="flex flex-col items-center mt-10">
