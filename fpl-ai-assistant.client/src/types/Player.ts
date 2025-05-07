@@ -11,4 +11,5 @@ export interface Player {
   photo: string;
   team_code: number;
   points: number;
+  opta_code?: string;
 }

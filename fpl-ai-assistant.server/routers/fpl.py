@@ -54,6 +54,7 @@ def get_player_info_map():
             "web_name": player['web_name'],
             "team_id": player["team"],
             "team_code": player["team_code"],
+            "opta_code": player["opta_code"],
         }
         for player in elements
     }
@@ -102,6 +103,7 @@ def get_team(team_id: int):
         pick["web_name"] = info["web_name"]
         pick["team_id"] = info["team_id"]
         pick["team_code"] = info["team_code"]
+        pick["opta_code"] = info["opta_code"]
         pick["points"] = points_map.get(element_id, 0)
     return picks
 

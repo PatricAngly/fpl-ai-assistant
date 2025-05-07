@@ -1,17 +1,20 @@
 import { Player } from "../types/Player";
 import PlayerCard from "../components/PlayerCard";
+import { getShirtImageUrl } from "../utils/getShirtImageUrl";
 
 type Props = {
   players: Player[];
 };
 
 const Pitch = ({ players }: Props) => {
+  console.log("Players in Pitch:", players);
   const getPlayersByType = (type: number) =>
     players
-      .filter((p) => p.element_type === type && p.multiplier > 0)
+      .slice(0, 11)
+      .filter((p) => p.element_type === type)
       .slice(0, 5);
 
-  const getBench = () => players.filter((p) => p.multiplier === 0).slice(0, 4);
+  const getBench = () => players.slice(11);
 
   const gk = getPlayersByType(1);
   const def = getPlayersByType(2);
@@ -28,11 +31,7 @@ const Pitch = ({ players }: Props) => {
           points={p.points * p.multiplier}
           is_captain={p.is_captain}
           is_vice_captain={p.is_vice_captain}
-          team_code={
-            p.element_type === 1
-              ? `https://fantasy.premierleague.com/dist/img/shirts/standard/shirt_${p.team_code}_1-66.webp`
-              : `https://fantasy.premierleague.com/dist/img/shirts/standard/shirt_${p.team_code}-66.webp`
-          }
+          team_code={getShirtImageUrl(p)}
         />
       ))}
     </div>
@@ -55,11 +54,7 @@ const Pitch = ({ players }: Props) => {
               points={p.points}
               is_captain={p.is_captain}
               is_vice_captain={p.is_vice_captain}
-              team_code={
-                p.element_type === 1
-                  ? `https://fantasy.premierleague.com/dist/img/shirts/standard/shirt_${p.team_code}_1-66.webp`
-                  : `https://fantasy.premierleague.com/dist/img/shirts/standard/shirt_${p.team_code}-66.webp`
-              }
+              team_code={getShirtImageUrl(p)}
             />
           ))}
         </div>

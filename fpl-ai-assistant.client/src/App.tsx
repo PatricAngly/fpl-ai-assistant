@@ -115,13 +115,17 @@ function App() {
               <h3>Available chips:</h3>
               <div className="flex flex-row gap-2 mt-2 flex-wrap justify-center">
                 <ul className="flex gap-2 flex-wrap ">
-                  {availableChips.map((chip, i) => (
-                    <li key={i}>
-                      <span className="bg-[#37003c] text-white text-xs font-semibold px-2 py-1 rounded shadow">
-                        {formatChipName[chip] ?? chip}
-                      </span>
-                    </li>
-                  ))}
+                  {availableChips.length > 0 ? (
+                    availableChips.map((chip, i) => (
+                      <li key={i}>
+                        <span className="bg-[#37003c] text-white text-xs font-semibold px-2 py-1 rounded shadow">
+                          {formatChipName[chip] ?? chip}
+                        </span>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="text-[#37003c]">None</li>
+                  )}
                 </ul>
               </div>
               <button
