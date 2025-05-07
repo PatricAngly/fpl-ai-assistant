@@ -124,13 +124,16 @@ def analyze_team(request: AnalyzeRequest):
             
 
         prompt = (
-            f"Here is my FPL team gameweek {gw}:\n"
-            f"{player_info}{chip_info}\n\n"
-            "Give improvement suggestions for the next gameweek. Format your response with the following keys as raw JSON, do not use Markdown or backticks. \n"
-            "- 'transfers': List of suggested player transfers, { out: string; in: string }[];\n"
-            "- 'captain': Suggested captain\n"
-            "- 'chips': Suggested chip usage (if suggested, give short explanation) e.g. [""]\n"
-            "- 'notes': Additional tips or insights."
+        f"Here is my FPL team gameweek {gw}:\n"
+        f"{player_info}{chip_info}\n\n"
+        "Give improvement suggestions for the next gameweek. Respond only in raw JSON (no markdown, no backticks). "
+        "Always use this format:\n"
+        "{\n"
+        "  \"transfers\": [{ \"out\": \"Player A\", \"in\": \"Player B\" }],\n"
+        "  \"captain\": \"Player Name\",\n"
+        "  \"chips\": [{ \"chip\": \"bench_boost\", \"explanation\": \"Why this chip is recommended.\" }],\n"
+        "  \"notes\": \"Additional tips or insights.\"\n"
+        "}"
         )
         
         completion = openai.chat.completions.create(

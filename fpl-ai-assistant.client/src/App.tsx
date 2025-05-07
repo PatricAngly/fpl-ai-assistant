@@ -69,7 +69,7 @@ function App() {
         if (parsed) {
           setAdvice(parsed);
         } else {
-          setAdvice({ notes: data.advice });
+          console.warn("Failed to parse advice:", data.advice);
         }
       } else {
         setError("No analysis data received.");
@@ -158,12 +158,14 @@ function App() {
             </p>
           )}
           {advice.chips && (
-            <p className="text-[#37003c] mt-2">
-              <strong>Chips:</strong>{" "}
-              {Array.isArray(advice.chips)
-                ? advice.chips.join(", ")
-                : advice.chips}
-            </p>
+            <ul className="mt-2 space-y-1">
+              {advice.chips.map((c, i) => (
+                <li key={i} className="text-[#37003c]">
+                  <strong>{formatChipName[c.chip] ?? c.chip}:</strong>{" "}
+                  {c.explanation}
+                </li>
+              ))}
+            </ul>
           )}
           {advice.notes && (
             <p className="text-[#37003c] mt-2">

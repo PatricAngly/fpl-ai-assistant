@@ -1,6 +1,9 @@
 export interface Advice {
   transfers?: { out: string; in: string }[];
   captain?: string;
-  chips?: string | string[];
+  chips?: {
+    chip: string;
+    explanation: string;
+  }[];
   notes?: string;
 }
