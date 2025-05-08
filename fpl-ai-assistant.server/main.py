@@ -18,7 +18,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Inkludera routes
+#  routes
 app.include_router(fpl.router)
 
 @app.get("/")

@@ -5,7 +5,7 @@ export function parseAdvice(rawAdvice: string): Advice | null {
 
   let cleaned = rawAdvice.trim();
 
-  // Rensa bort Markdown-format: ```json ... ```
+  // Remove Markdown-format: ```json ... ```
   if (cleaned.startsWith("```json")) {
     cleaned = cleaned
       .replace(/^```json/, "")

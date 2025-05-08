@@ -1,27 +1,27 @@
-# Node & Python dependencies
+# === Node.js (frontend) ===
 node_modules/
+dist/
+.vite/
+*.log
+
+# === Python (backend) ===
 venv/
 __pycache__/
 *.pyc
 *.pyo
 
-# Logs & Environment
-*.log
+# === Env-filer ===
 .env
 .env.*
-*.local
 
-# Build & coverage
-dist/
+# === VSCode/Editorfiler ===
+.vscode/
+.DS_Store
+.idea/
+
+# === Build and coverage ===
 build/
 coverage/
 
-# OS-specific and editor files
-.DS_Store
-.vscode/
-.idea/
-*.sw?
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
+# === Lint/cache ===
+*.eslintcache

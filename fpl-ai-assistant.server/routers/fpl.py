@@ -109,7 +109,6 @@ def get_team(team_id: int):
 
 @router.post("/analyze")
 def analyze_team(request: AnalyzeRequest):
-    print("✅ Available chips received:", request.chips) 
     try:
         gw = request.gw or get_latest_played_gameweek()
 

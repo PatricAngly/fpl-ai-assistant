@@ -13,7 +13,7 @@ const TeamInput = ({ teamId, setTeamId, onFetch }: Props) => (
   >
     <input
       type="text"
-      placeholder="Ange ditt FPL Team ID"
+      placeholder="FPL Team ID"
       value={teamId}
       onChange={(e) => setTeamId(e.target.value)}
     />
