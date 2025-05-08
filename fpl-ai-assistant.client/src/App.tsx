@@ -5,6 +5,7 @@ import { Advice } from "./types/Advice";
 import { parseAdvice } from "./utils/parseAdvice";
 import { formatChipName } from "./utils/formatChipName";
 import { TeamScore } from "./types/TeamScore";
+import { fetchTeamData } from "./service/fplApi";
 import Pitch from "./components/Pitch";
 import TeamScoreCard from "./components/TeamScoreCard";
 
@@ -24,24 +25,14 @@ function App() {
     setLoading(true);
     setError("");
     try {
-      const [teamRes, chipsRes] = await Promise.all([
-        fetch(`http://localhost:8000/api/fpl/${teamId}`),
-        fetch(`http://localhost:8000/api/fpl/${teamId}/available-chips`),
-      ]);
+      const data = await fetchTeamData(teamId);
 
-      if (!teamRes.ok || !chipsRes.ok) {
-        throw new Error("Något gick fel vid hämtning");
-      }
-
-      const teamData = await teamRes.json();
-      const chips = await chipsRes.json();
-
-      setPlayers(teamData.picks);
-      setGameweek(teamData.entry_history);
-      setAvailableChips(chips);
+      setPlayers(data.picks);
+      setGameweek(data.gameweek);
+      setAvailableChips(data.availableChips);
       setTeamId("");
     } catch (err) {
-      setError("Kunde inte hämta lag och chips.");
+      setError("Could not fetch team data. Please check the ID.");
     } finally {
       setLoading(false);
     }
@@ -86,7 +77,6 @@ function App() {
       setLoading(false);
     }
   };
-  console.log(gameweek);
 
   return (
     <div className="lg:flex lg:flex-row lg:items-center min-h-screen bg-gradient-to-b text-[#37003c] p-4">
