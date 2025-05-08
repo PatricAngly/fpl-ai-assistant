@@ -10,7 +10,12 @@ An AI-powered Fantasy Premier League assistant built to analyze your FPL team an
 - 👕 Players rendered on a responsive football pitch (bench included)
 - 🛠 Built with TypeScript, React, Tailwind CSS, FastAPI & OpenAI API
 
----
+## 📦 Project Structure
+
+This is a monorepo containing:
+
+- `fpl-ai-assistant.client` – Frontend in React + TypeScript + Tailwind
+- `fpl-ai-assistant.server` – Backend in FastAPI + Python + OpenAI API
 
 ## 🚀 Getting Started
 
@@ -45,3 +50,25 @@ uvicorn main:app --reload
 Create a .env file in fpl-ai-assistant.server/:
 OPENAI_API_KEY=your-openai-api-key
 ```
+
+## 📸 Screenshots
+
+### ⚽️ Team View
+
+![Team](fpl-ai-assistant.client/src/assets/screenshot2.png)
+
+### 🧠 AI Advice View
+
+![AI Advice](fpl-ai-assistant.client/src/assets/screenshot3.png)
+
+## 🔮 Coming Soon
+
+- 💰 **Bank balance analysis**
+- 🔄 **Free transfers analysis**
+- 📊 **Player history & fixture difficulty integration**
+- 📈 **Live stats & expected points**
+- 🕰️ **Historic trend analysis**
+
+## 👨🏽‍💻 Built by
+
+Patric Angly - https://github.com/PatricAngly

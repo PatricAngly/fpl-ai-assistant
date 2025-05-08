@@ -171,7 +171,7 @@ function App() {
         )}
       </div>
       {advice && (
-        <div className="bg-white p-4 rounded shadow lg::mt-10 max-w-3xl mx-auto lg:flex-auto">
+        <div className="bg-white p-4 rounded shadow mt-10 max-w-3xl mx-auto lg:flex-auto">
           {advice.transfers && (
             <>
               <h3 className="text-[#37003c] mt-2 font-bold">Transfers</h3>
