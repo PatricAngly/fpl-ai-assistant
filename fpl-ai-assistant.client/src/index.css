@@ -1,1 +1,27 @@
 @import "tailwindcss";
+
+@layer utilities {
+  .fpl-bg {
+    background-image: linear-gradient(
+        rgba(255, 255, 255, 0) 30px,
+        rgba(255, 255, 255, 0.5) 75px,
+        white 120px
+      ),
+      url("https://fantasy.premierleague.com/static/media/pattern-2-crop-184.d7588c45.png"),
+      linear-gradient(to right, rgb(2, 239, 255), rgb(98, 123, 255));
+    background-repeat: no-repeat;
+    background-position: 0px center, right top, 0px center;
+  }
+
+  @media (max-width: 640px) {
+    .fpl-bg {
+      background-image: linear-gradient(
+          rgba(255, 255, 255, 0) 20px,
+          rgba(255, 255, 255, 0.4) 50px,
+          white 100px
+        ),
+        url("https://fantasy.premierleague.com/static/media/pattern-2-crop-90.0e86ae39.png"),
+        linear-gradient(to right, rgb(2, 239, 255), rgb(98, 123, 255));
+    }
+  }
+}

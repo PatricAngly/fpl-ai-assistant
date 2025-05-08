@@ -6,6 +6,7 @@ import { parseAdvice } from "./utils/parseAdvice";
 import { formatChipName } from "./utils/formatChipName";
 import { TeamScore } from "./types/TeamScore";
 import { fetchTeamData } from "./service/fplApi";
+import { getRandomBackground } from "./utils/getRandomBackground";
 import Pitch from "./components/Pitch";
 import TeamScoreCard from "./components/TeamScoreCard";
 
@@ -23,6 +24,7 @@ function App() {
     setAvailableChips([]);
     e.preventDefault();
     setLoading(true);
+    setPlayers([]);
     setError("");
     try {
       const data = await fetchTeamData(teamId);
@@ -32,7 +34,7 @@ function App() {
       setAvailableChips(data.availableChips);
       setTeamId("");
     } catch (err) {
-      setError("Could not fetch team data. Please check the ID.");
+      setError("Could not get team data. Please check the ID.");
     } finally {
       setLoading(false);
     }
@@ -78,41 +80,69 @@ function App() {
     }
   };
 
+  const randomBackground = getRandomBackground();
+
   return (
-    <div className="lg:flex lg:flex-row lg:items-center min-h-screen bg-gradient-to-b text-[#37003c] p-4">
-      <div className="lg:flex-auto text-center">
-        <h1 className="text-3xl font-bold text-green-500">FPL AI-assistant</h1>
-        <form onSubmit={handleFetch}>
-          <input
-            className="border border-gray-300 rounded p-2 mt-4 mb-2"
-            type="text"
-            placeholder="FPL Team ID"
-            value={teamId}
-            onChange={(e) => setTeamId(e.target.value)}
+    <div className="lg:flex lg:flex-col lg:items-center min-h-screen bg-gradient-to-b text-[#37003c] p-4 w-full max-w-[95rem] mx-auto mb-20">
+      <div className="w-full max-w-[95rem] mx-auto">
+        <div className="relative w-full">
+          <img
+            src={randomBackground}
+            alt="Background"
+            className="w-full max-w-md mx-auto object-contain sm:object-cover"
           />
-          <button
-            className="p-2 rounded-sm bg-[#37003c] ml-6 text-white"
-            type="submit"
-          >
-            Get team
-          </button>
-        </form>
-
-        {loading && <p>Loading...</p>}
-        {error && <p style={{ color: "red" }}>{error}</p>}
-
+          <div className="absolute mt-50 lg:mt-60 inset-0 flex flex-col justify-center items-center bg-gradient-to-b from-transparent to-white">
+            <div className="w-full mt-25 lg:mt-30 max-w-3xl mx-auto p-4 rounded-b-sm shadow-xl text-center">
+              <h1 className="text-3xl font-bold text-[#37003c]">
+                FPL AI-assistant
+              </h1>
+              <form className="" onSubmit={handleFetch}>
+                <input
+                  className="border border-gray-300 rounded p-2 mt-4 mb-2"
+                  type="text"
+                  placeholder="FPL Team ID"
+                  value={teamId}
+                  onChange={(e) => setTeamId(e.target.value)}
+                />
+                <button
+                  className="p-2 rounded-sm bg-[#00ff87] ml-6 text-[#37003c] font-semibold"
+                  type="submit"
+                >
+                  Get team
+                </button>
+              </form>
+              {error && <p style={{ color: "red" }}>{error}</p>}
+            </div>
+          </div>
+        </div>
+        {players.length < 1 && (
+          <div className="bg-[url('/src/assets/pitch.svg')] bg-cover h-120 sm:h-190 bg-center border-white w-full p-4 max-w-3xl mx-auto rounded-b-smopacity-50 mt-30"></div>
+        )}
+      </div>
+      <div className="lg:flex-auto text-center lg:mt-0 mx-auto w-full max-w-3xl ">
+        {loading && (
+          <div className="fixed inset-0 z-50 bg-black/50 bg-o flex items-center justify-center">
+            <img
+              src="/src/assets/fotball.png"
+              alt="Loading..."
+              className="w-20 h-20 lg:w-40 lg:h-40 animate-spin"
+            />
+          </div>
+        )}
         {players.length > 0 && (
           <>
-            <h2 className="text-[#37003c] font-bold ">
-              {gameweek && (
-                <TeamScoreCard
-                  event={gameweek.event}
-                  points={gameweek.points}
-                  bank={gameweek.bank}
-                />
-              )}
-            </h2>
-            <Pitch players={players} />
+            <div className="shadow-lg rounded-sm fpl-bg mt-30 ">
+              <h2 className="text-[#37003c] font-bold ">
+                {gameweek && (
+                  <TeamScoreCard
+                    event={gameweek.event}
+                    points={gameweek.points}
+                    bank={gameweek.bank}
+                  />
+                )}
+              </h2>
+              <Pitch players={players} />
+            </div>
             <div className="flex flex-col items-center mt-10">
               <h3>Available chips:</h3>
               <div className="flex flex-row gap-2 mt-2 flex-wrap justify-center">

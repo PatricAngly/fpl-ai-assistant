@@ -38,13 +38,13 @@ const Pitch = ({ players }: Props) => {
   );
 
   return (
-    <div className="bg-[url('/src/assets/pitch.svg')] bg-cover h-120 sm:h-190 bg-center border-4 border-white w-full p-4 max-w-3xl mx-auto mt-8 shadow-lg">
+    <div className="bg-[url('/src/assets/pitch.svg')] bg-cover h-120 sm:h-190 bg-center rounded-b-sm border-white w-full p-4 max-w-3xl mx-auto shadow-lg">
       {renderLine(gk)}
       {renderLine(def)}
       {renderLine(mid)}
       {renderLine(fwd)}
 
-      <div className="mt-10 sm:mt-22">
+      <div className="mt-10 lg:mt-20">
         <h3 className="text-center text-white font-bold mb-2 text-sm">Bench</h3>
         <div className="flex justify-center gap-4">
           {bench.map((p) => (

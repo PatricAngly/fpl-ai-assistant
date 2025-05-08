@@ -17,12 +17,12 @@ function PlayerCard({
   points,
 }: PlayerCardProps) {
   return (
-    <div className="relative w-[60px] h-[78px] bg-[linear-gradient(to_right_bottom,rgb(13,147,86),rgb(16,199,115))]  text-black text-xs md:text-sm font-semibold rounded-sm shadow-md flex flex-col items-center justify-center text-center p-1">
+    <div className="relative w-[60px] h-[78px] lg:w-[100px] lg:h-[110px] bg-[linear-gradient(to_right_bottom,rgb(13,147,86),rgb(16,199,115))]  text-black text-xs md:text-sm font-semibold rounded-sm shadow-md flex flex-col items-center justify-center text-center p-1">
       {team_code && (
         <img
           src={team_code}
           alt={web_name}
-          className="absolute inset-0 size-18 object-contain z-0 p-1"
+          className="inset-0 size-18 lg:size-20 object-contain lg:object-fill z-0 p-1"
         />
       )}
       <span className="absolute top-1 left-1">
@@ -37,7 +37,6 @@ function PlayerCard({
           <span className="text-white">{points}</span>
         </div>
       </div>
-      {/* <div className="text-[10px] text-gray-600">{team}</div> */}
     </div>
   );
 }
