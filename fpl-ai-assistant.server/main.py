@@ -23,4 +23,4 @@ app.include_router(fpl.router)
 
 @app.get("/")
 def root():
-    return {"message": "FPL AI Assistant Backend är igång!"}
+    return {"message": "FPL AI Assistant Backend is running!"}

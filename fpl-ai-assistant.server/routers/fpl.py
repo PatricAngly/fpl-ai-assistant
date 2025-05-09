@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/fpl")
 # Get OpenAI API key from environment variables
 openai.api_key = os.getenv("OPENAI_API_KEY")
 if not openai.api_key:
-    raise RuntimeError("OPENAI_API_KEY saknas i .env eller miljövariabler")
+    raise RuntimeError("OPENAI_API_KEY missing in .env file.")  
 
 class Player(BaseModel):
     element: int
@@ -83,7 +83,12 @@ def get_available_chips(team_id: int) -> list[str]:
     return list(all_chips - used)
 
 
-@router.get("/{team_id}")
+@router.get(
+    "/{team_id}",
+    response_model=dict,
+    summary="Get team data",
+    description="Returns picks, captain, bench and team details for the latest played gameweek."
+)
 def get_team(team_id: int):
     gw = get_latest_played_gameweek()
 
@@ -107,7 +112,12 @@ def get_team(team_id: int):
         pick["points"] = points_map.get(element_id, 0)
     return picks
 
-@router.post("/analyze")
+@router.post(
+    "/analyze",
+    response_model=dict,
+    summary="Analyze team",
+    description="Send an FPL team to OpenAi and receive suggestions for transfers, captain choice, and chip usage."
+)
 def analyze_team(request: AnalyzeRequest):
     try:
         gw = request.gw or get_latest_played_gameweek()

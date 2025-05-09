@@ -1,4 +1,3 @@
-// utils/getShirtImageUrl.ts
 import { Player } from "../types/Player";
 
 export function getShirtImageUrl(player: Player): string {

@@ -123,7 +123,7 @@ function App() {
         {loading && (
           <div className="fixed inset-0 z-50 bg-black/50 bg-o flex items-center justify-center">
             <img
-              src="/src/assets/fotball.png"
+              src="/src/assets/football.png"
               alt="Loading..."
               className="w-20 h-20 lg:w-40 lg:h-40 animate-spin"
             />
