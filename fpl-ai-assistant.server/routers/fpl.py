@@ -1,6 +1,7 @@
 # routers/fpl.py
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from schemas import PlayerData, AnalyzeRequest, TeamResponse, AdviceResponse
+from typing import Dict, Any
 import requests
 import openai
 import os
@@ -15,19 +16,6 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 if not openai.api_key:
     raise RuntimeError("OPENAI_API_KEY missing in .env file.")  
 
-class Player(BaseModel):
-    element: int
-    position: int
-    is_captain: bool
-    is_vice_captain: bool
-    element_type: int
-    name: str | None = None
-
-class AnalyzeRequest(BaseModel):
-    players: list[Player]
-    gw: int | None = None  
-    chips: list[str] | None = None
-
 def get_latest_played_gameweek():
     res = requests.get("https://fantasy.premierleague.com/api/bootstrap-static/")
     if not res.ok:
@@ -39,26 +27,32 @@ def get_latest_played_gameweek():
     current_event = max(finished_events, key=lambda e: e['id'])
     return current_event['id']
 
-def get_player_info_map():
+def get_player_info_map() -> Dict[int, Dict[str, Any]]:
     res = requests.get("https://fantasy.premierleague.com/api/bootstrap-static/")
     if not res.ok:
         raise HTTPException(status_code=500, detail="Could not fetch player data.")
+
     data = res.json()
-    elements = data['elements']
-    teams = {team['id']: team['name'] for team in data['teams']}
+    team_map = get_team_map(data)
+    elements = data.get('elements', [])
 
-    return {
-        player['id']: {
+    player_map = {}
+    for player in elements:
+        player_id = player['id']
+        player_map[player_id] = {
             "name": f"{player['first_name']} {player['second_name']}",
-            "team": teams.get(player['team'], "Unknown Team"),
+            "team": team_map.get(player['team'], "Unknown Team"),
             "web_name": player['web_name'],
-            "team_id": player["team"],
-            "team_code": player["team_code"],
-            "opta_code": player["opta_code"],
+            "team_id": player['team'],
+            "team_code": player['team_code'],
+            "opta_code": player.get("opta_code")
         }
-        for player in elements
-    }
 
+    return player_map
+
+def get_team_map(data: dict) -> Dict[int, str]:
+    return {team["id"]: team["name"] for team in data.get("teams", [])}
+    
 def get_player_points_map(gw: int) -> dict[int, int]:
     url = f"https://fantasy.premierleague.com/api/event/{gw}/live/"
     res = requests.get(url)
@@ -85,7 +79,7 @@ def get_available_chips(team_id: int) -> list[str]:
 
 @router.get(
     "/{team_id}",
-    response_model=dict,
+    response_model=TeamResponse,
     summary="Get team data",
     description="Returns picks, captain, bench and team details for the latest played gameweek."
 )
@@ -95,26 +89,40 @@ def get_team(team_id: int):
     res = requests.get(f"https://fantasy.premierleague.com/api/entry/{team_id}/event/{gw}/picks/")
     if not res.ok:
         raise HTTPException(status_code=500, detail="Could not fetch team data.")
-    picks = res.json()
+    data = res.json()
 
     player_map = get_player_info_map()
     points_map = get_player_points_map(gw)
 
-    for pick in picks.get("picks", []):
+    enriched_picks = []
+    for pick in data.get("picks", []):
         element_id = pick["element"]
         info = player_map.get(element_id)
-        pick["name"] = info["name"]
-        pick["team"] = info["team"]
-        pick["web_name"] = info["web_name"]
-        pick["team_id"] = info["team_id"]
-        pick["team_code"] = info["team_code"]
-        pick["opta_code"] = info["opta_code"]
-        pick["points"] = points_map.get(element_id, 0)
-    return picks
+
+        enriched_picks.append(PlayerData(
+            element=element_id,
+            position=pick["position"],
+            multiplier=pick["multiplier"],
+            is_captain=pick["is_captain"],
+            is_vice_captain=pick["is_vice_captain"],
+            element_type=pick["element_type"],
+            name=info["name"],
+            team=info["team"],
+            web_name=info["web_name"],
+            team_code=info["team_code"],
+            team_id=info["team_id"],
+            opta_code=info.get("opta_code"),
+            points=points_map.get(element_id, 0)
+        ))
+
+    return TeamResponse(
+        picks=enriched_picks,
+        entry_history=data.get("entry_history", {})
+    )
 
 @router.post(
     "/analyze",
-    response_model=dict,
+    response_model=AdviceResponse,
     summary="Analyze team",
     description="Send an FPL team to OpenAi and receive suggestions for transfers, captain choice, and chip usage."
 )
@@ -123,7 +131,7 @@ def analyze_team(request: AnalyzeRequest):
         gw = request.gw or get_latest_played_gameweek()
 
         player_info = "\n".join([
-        f"{p.name or f'ID {p.element}'}, Pos: {p.position}, Captain: {p.is_captain}"
+        f"{p.name or f'ID {p.element}'}, Pos: {p.position}, Captain: {p.is_captain}, Points: {p.points}"
         for p in request.players
         ])
         
